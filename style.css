@@ -1,7 +1,7 @@
 body {
     margin: 0;
-    font-family: 'Segoe UI', sans-serif;
-    background: linear-gradient(135deg, #1e3c72, #2a5298);
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
     color: white;
     text-align: center;
     min-height: 100vh;
@@ -10,6 +10,35 @@ body {
 .title {
     padding: 20px;
     font-size: 2.5rem;
+}
+
+.controls {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+input {
+    padding: 10px;
+    border-radius: 10px;
+    border: none;
+    width: 200px;
+}
+
+button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    background: #00c6ff;
+    color: white;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+button:hover {
+    background: #0072ff;
 }
 
 .weather-container {
@@ -21,17 +50,23 @@ body {
 }
 
 .card {
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(15px);
     padding: 20px;
     border-radius: 20px;
     width: 250px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-    transition: transform 0.3s ease;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+    animation: fadeIn 0.5s ease forwards;
+    position: relative;
 }
 
-.card:hover {
-    transform: translateY(-10px);
+.card button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: red;
+    padding: 5px 8px;
+    font-size: 12px;
 }
 
 .temp {
@@ -57,11 +92,16 @@ body {
     100% { transform: rotate(360deg); }
 }
 
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
 .hidden {
     display: none;
 }
 
 .error {
-    color: #ffcccc;
+    color: #ff8080;
     font-weight: bold;
 }

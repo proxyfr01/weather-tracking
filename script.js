@@ -1,17 +1,16 @@
-const cities = [
-    { name: "Delhi", lat: 28.6139, lon: 77.2090 },
-    { name: "Mumbai", lat: 19.0760, lon: 72.8777 },
-    { name: "Bangalore", lat: 12.9716, lon: 77.5946 }
-];
-
 const container = document.getElementById("weather-container");
 const loader = document.getElementById("loader");
 const errorDiv = document.getElementById("error");
+const addBtn = document.getElementById("add-city");
+const refreshBtn = document.getElementById("refresh");
+const cityInput = document.getElementById("city-input");
+
+let cities = [];
 
 function getWeatherEmoji(code) {
     if (code === 0) return "☀️";
     if (code <= 3) return "⛅";
-    if (code <= 48) return "🌫";
+    if (code <= 47) return "🌫";
     if (code <= 67) return "🌧";
     if (code <= 77) return "❄️";
     return "🌩";
@@ -22,11 +21,20 @@ function getWeatherCondition(code) {
     if (code <= 3) return "Partly Cloudy";
     if (code <= 48) return "Foggy";
     if (code <= 67) return "Rainy";
-    if (code <= 77) return "Snow";
+    if (code <= 76) return "Snow";
     return "Stormy";
 }
 
-async function fetchWeather() {
+async function fetchCoordinates(cityName) {
+    const res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${cityName}`);
+    const data = await res.json();
+    if (!data.results) throw new Error("City not found");
+    return data.results[0];
+}
+
+async function fetchWeatherData() {
+    if (cities.length === 0) return;
+
     loader.classList.remove("hidden");
     errorDiv.classList.add("hidden");
 
@@ -48,6 +56,7 @@ async function fetchWeather() {
             card.className = "card";
 
             card.innerHTML = `
+                <button onclick="removeCity(${index})">X</button>
                 <h2>${cities[index].name}</h2>
                 <div class="emoji">${getWeatherEmoji(code)}</div>
                 <div class="temp">${temp}°C</div>
@@ -58,11 +67,39 @@ async function fetchWeather() {
         });
 
     } catch (err) {
-        errorDiv.textContent = "Failed to fetch weather data!";
+        errorDiv.textContent = "Something went wrong!";
         errorDiv.classList.remove("hidden");
     } finally {
         loader.classList.add("hidden");
     }
 }
 
-fetchWeather();
+async function addCity() {
+    const cityName = cityInput.value.trim();
+    if (!cityName) return;
+
+    try {
+        const data = await fetchCoordinates(cityName);
+
+        cities.push({
+            name: data.name,
+            lat: data.latitude,
+            lon: data.longitude
+        });
+
+        cityInput.value = "";
+        fetchWeatherData();
+
+    } catch {
+        errorDiv.textContent = "City not found!";
+        errorDiv.classList.remove("hidden");
+    }
+}
+
+function removeCity(index) {
+    cities.splice(index, 1);
+    fetchWeatherData();
+}
+
+addBtn.addEventListener("click", addCity);
+refreshBtn.addEventListener("click", fetchWeatherData);
